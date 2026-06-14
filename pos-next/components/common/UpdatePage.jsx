@@ -16,6 +16,7 @@ const UpdatePage = ({ fields = [], modelName }) => {
 
   const defaultFields = [
     { name: "identifier", label: "Identifier", readOnly: true },
+    
   ];
 
   const allFields = [...defaultFields, ...fields];
@@ -173,6 +174,7 @@ const UpdatePage = ({ fields = [], modelName }) => {
         name={field.name}
         value={formData[field.name] || ""}
         onChange={handleChange}
+        readOnly={field.readOnly === true}
         className="border rounded-lg px-3 py-2 w-full"
       />
     );

@@ -108,9 +108,10 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
 const handleUpdate = async () => {
   const newErrors = validateForm(fields, formData);
   setErrors(newErrors);
-  if (Object.keys(newErrors).length > 0) {
-    return;
-  }
+  const hasErrors = Object.keys(newErrors).length > 0;
+if (hasErrors) {
+  return;
+}
   try {
     await api.post(`/${modelName}/update`, formData);
     setShowModal(false);
