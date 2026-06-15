@@ -29,10 +29,6 @@ export const validateForm = (
   return newErrors;
 };
 
-// -------------------------
-// Validation functions
-// -------------------------
-
 const validateRequired = (field, value) => {
   if (isEmpty(value)) {
     return `${field.label} is required`;
