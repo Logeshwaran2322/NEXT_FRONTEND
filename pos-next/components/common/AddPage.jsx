@@ -5,40 +5,58 @@ import { useRouter } from "next/navigation";
 import PropTypes from "prop-types";
 import api from "../../services/api";
 
-const AddPage = ({ fields, modelName, children }) => {
+const AddPage = ({
+  fields,
+  modelName,
+  initialData = {},
+  renderForm,
+}) => {
   const router = useRouter();
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState(initialData);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
 
-    setErrors({
-      ...errors,
+    setErrors((prev) => ({
+      ...prev,
       [name]: "",
-    });
+    }));
   };
 
   const validate = () => {
-    let newErrors = {};
+    const newErrors = {};
 
     fields.forEach((field) => {
       const value = formData[field.name];
+
       if (field.required === false) return;
-      if (!value || value.toString().trim() === "") {
-        newErrors[field.name] = `${field.label} is required`;
-        return;
+
+      if (
+        value === undefined ||
+        value === null ||
+        value.toString().trim() === ""
+      ) {
+        newErrors[field.name] =
+          `${field.label} is required`;
       }
-      if (field.name === "username" && value &&!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)) {
-      newErrors[field.name] = "Invalid email format";
-    }
+
+      if (
+        field.name === "username" &&
+        value &&
+        !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)
+      ) {
+        newErrors[field.name] =
+          "Invalid email format";
+      }
+
       if (
         field.type === "password" &&
         value &&
@@ -48,16 +66,19 @@ const AddPage = ({ fields, modelName, children }) => {
           "Password must be at least 6 characters";
       }
 
-     if (field.name === "phoneNo" && value) {
-      if (!/^\d+$/.test(value)) {
-        newErrors[field.name] = "Phone number must contain only digits";
-      } 
-      else if (value.length !== 10) {
-        newErrors[field.name] = "Phone number must be exactly 10 digits";
+      if (field.name === "phoneNo" && value) {
+        if (!/^\d+$/.test(value)) {
+          newErrors[field.name] =
+            "Phone number must contain only digits";
+        } else if (value.length !== 10) {
+          newErrors[field.name] =
+            "Phone number must be exactly 10 digits";
+        }
       }
-    }
-   });
+    });
+
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -65,17 +86,11 @@ const AddPage = ({ fields, modelName, children }) => {
     if (field.component) {
       return field.component({
         value: formData[field.name],
-        onChange: (value) => {
-          setFormData({
-            ...formData,
+        onChange: (value) =>
+          setFormData((prev) => ({
+            ...prev,
             [field.name]: value,
-          });
-
-          setErrors({
-            ...errors,
-            [field.name]: "",
-          });
-        },
+          })),
       });
     }
 
@@ -85,7 +100,7 @@ const AddPage = ({ fields, modelName, children }) => {
           name={field.name}
           value={formData[field.name] || ""}
           onChange={handleChange}
-          className="border rounded-lg px-3 py-2"
+          className="w-full border rounded-lg px-3 py-2"
         />
       );
     }
@@ -96,16 +111,19 @@ const AddPage = ({ fields, modelName, children }) => {
         name={field.name}
         value={formData[field.name] || ""}
         onChange={handleChange}
-        className="border rounded-lg px-3 py-2"
+        className="w-full border rounded-lg px-3 py-2"
       />
     );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
 
     if (!validate()) return;
+
+    const token =
+      localStorage.getItem("token");
+
     try {
       const res = await api.post(
         `/${modelName}/add`,
@@ -114,7 +132,7 @@ const AddPage = ({ fields, modelName, children }) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (res.data.success === false) {
@@ -123,12 +141,12 @@ const AddPage = ({ fields, modelName, children }) => {
       }
 
       setMessage("Added successfully");
+
       setTimeout(() => {
         router.push(`/${modelName}`);
       }, 1500);
 
-    }
-     catch (err) {
+    } catch (err) {
       console.log(formData);
       console.error(err);
       setMessage("Failed to add");
@@ -136,43 +154,70 @@ const AddPage = ({ fields, modelName, children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6fb] flex items-center justify-center">
-      <div className="w-[560px] bg-white p-8 rounded-xl shadow">
-        <h3 className="text-center text-blue-600 text-xl font-bold mb-6">
+    <div className="min-h-screen bg-[#f4f6fb] flex justify-center py-10">
+      <div className="w-[800px] bg-white p-8 rounded-xl shadow">
+
+        <h3 className="text-center text-blue-600 text-2xl font-bold mb-8">
           Add {modelName}
         </h3>
+
         {message && (
-          <div className="text-center text-red-500 mb-3">
+          <div className="mb-4 text-center text-red-500">
             {message}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
+
+          {/* Base Fields */}
           {fields.map((field) => (
             <div key={field.name}>
-              <div className="grid grid-cols-[150px_1fr] gap-3 items-center">
-                <label className="text-sm font-semibold">
+              <div className="grid grid-cols-[220px_1fr] gap-4 items-center">
+
+                <label className="font-semibold">
                   {field.label}
                 </label>
+
                 {renderField(field)}
               </div>
+
               {errors[field.name] && (
-                <p className="text-red-500 text-sm ml-[163px] mt-1">
+                <p className="ml-[235px] mt-1 text-sm text-red-500">
                   {errors[field.name]}
                 </p>
               )}
             </div>
           ))}
-          {children}
-          <button className="w-full bg-blue-600 text-white py-2 rounded-lg">
+
+          {/* Extra Customer Fields */}
+          {renderForm &&
+            renderForm({
+              formData,
+              handleChange,
+              errors,
+            })}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg"
+          >
             Add {modelName}
           </button>
+
         </form>
+
         <button
-          onClick={() => router.push(`/${modelName}`)}
-          className="w-full mt-3 border border-blue-600 text-blue-600 py-2 rounded-lg"
+          onClick={() =>
+            router.push(`/${modelName}`)
+          }
+          className="w-full mt-3 border border-blue-600 text-blue-600 py-3 rounded-lg"
         >
           ← Back
         </button>
+
       </div>
     </div>
   );
@@ -181,7 +226,8 @@ const AddPage = ({ fields, modelName, children }) => {
 AddPage.propTypes = {
   fields: PropTypes.array.isRequired,
   modelName: PropTypes.string.isRequired,
-  children: PropTypes.node,
+  initialData: PropTypes.object,
+  renderForm: PropTypes.func,
 };
 
 export default AddPage;

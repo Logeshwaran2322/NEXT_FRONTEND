@@ -29,7 +29,7 @@ function PriceTypeField({ value, onChange }) {
     >
       <option value="">Select Price Type</option>
       <option value="MRP">MRP</option>
-      <option value="SELLING">SELLING</option>
+      <option value="SELLING PRICE">SELLING PRICE</option>
       <option value="DISCOUNT">DISCOUNT</option>
     </select>
   );

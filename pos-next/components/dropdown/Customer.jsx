@@ -4,20 +4,19 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import api from "../../services/api";
 
-
-const ProductDropdown = ({ value, onChange }) => {
-  const [Products, setProducts] = useState([]);
+const CustomerDropdown = ({ value, onChange }) => {
+  const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    fetchProducts();
+    fetchCustomers();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchCustomers = async () => {
     try {
       const token = localStorage.getItem("token");
 
       const res = await api.post(
-        "/product/list",
+        "/customer/list",
         {
           page: 0,
           sizePerPage: 1000,
@@ -30,10 +29,9 @@ const ProductDropdown = ({ value, onChange }) => {
           },
         }
       );
-
-      setProducts(res.data.dtoList || []);
+      setCustomers(res.data.dtoList || []);
     } catch (err) {
-      console.error("Product fetch error:", err);
+      console.error("Customer fetch error:", err);
     }
   };
 
@@ -43,18 +41,21 @@ const ProductDropdown = ({ value, onChange }) => {
       onChange={(e) => onChange(e.target.value)}
       className="border rounded-lg px-3 py-2 w-full"
     >
-      <option value="">Select Product</option>
-      {Products.map((p) => (
-        <option key={p.identifier} value={p.identifier}>
-          {p.identifier}
+      <option value="">Select Customer</option>
+
+      {customers.map((c) => (
+        <option key={c.identifier} value={c.identifier}>
+          {/* Change field based on your DTO */}
+          {c.name || c.identifier}
         </option>
       ))}
     </select>
   );
 };
-ProductDropdown.propTypes = {
-  value: PropTypes.string,
+
+CustomerDropdown.propTypes = {
+  value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
-export default ProductDropdown;
+export default CustomerDropdown;
