@@ -4,49 +4,50 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import api from "../../services/api";
 
-const ModelDropdown = ({ value, onChange }) => {
-  const [models, setModels] = useState([]);
+const RackDropdown = ({ value, onChange }) => {
+  const [racks, setRacks] = useState([]);
 
   useEffect(() => {
-    fetchModels();
+    fetchRacks();
   }, []);
 
-  const fetchModels = async () => {
+  const fetchRacks = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await api.get("/models/active", {
+      const res = await api.get("/rack/active", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setModels(res.data || []);
+      setRacks(res.data || []);
+
     } catch (err) {
-      console.error("Model fetch error:", err);
+      console.error("Rack fetch error:", err);
     }
   };
 
   return (
     <select
-      value={value}
+      value={value || ""}
       onChange={(e) => onChange(e.target.value)}
       className="border rounded-lg px-3 py-2 w-full"
     >
-      <option value="">Select Model</option>
+      <option value="">Select Rack</option>
 
-      {models.map((m) => (
-        <option key={m.identifier} value={m.modelName}>
-          {m.modelName}
+      {racks.map((rack) => (
+        <option key={rack.identifier} value={rack.identifier}>
+          {rack.name}
         </option>
       ))}
     </select>
   );
 };
 
-ModelDropdown.propTypes = {
+RackDropdown.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 };
 
-export default ModelDropdown;
+export default RackDropdown;

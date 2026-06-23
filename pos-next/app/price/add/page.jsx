@@ -3,8 +3,6 @@
 import PropTypes from 'prop-types';
 import AddPage from "../../../components/Common/AddPage";
 import ProductDropdown from "../../../components/dropdown/Product";
-import Sidebar from "../../../components/layout/Sidebar";
-
 function ProductField({ value, onChange }) {
   return (
     <ProductDropdown value={value} onChange={onChange} />
@@ -62,11 +60,9 @@ export default function AddPrice() {
   ];
 
   return (
-    <Sidebar>
     <AddPage
       fields={fields}
       modelName="price"
     />
-    </Sidebar>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import PropTypes from "prop-types";
 import api from "../../services/api";
+import Sidebar from "../layout/Sidebar";
 
 const AddPage = ({
   fields,
@@ -100,7 +101,7 @@ const AddPage = ({
           name={field.name}
           value={formData[field.name] || ""}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm transition-all min-h-[100px]"
         />
       );
     }
@@ -111,7 +112,7 @@ const AddPage = ({
         name={field.name}
         value={formData[field.name] || ""}
         onChange={handleChange}
-        className="w-full border rounded-lg px-3 py-2"
+        className="w-full h-10 border border-slate-300 rounded-md px-3 text-sm text-slate-800 bg-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm transition-all"
       />
     );
   };
@@ -154,38 +155,42 @@ const AddPage = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6fb] flex justify-center py-10">
-      <div className="w-[800px] bg-white p-8 rounded-xl shadow">
+    <Sidebar>
+    <div className="min-h-screen bg-[#f4f6fb] flex justify-center py-12 px-4">
+      <div className="w-[800px] bg-white p-8 rounded-xl shadow-md border border-slate-100">
 
-        <h3 className="text-center text-blue-600 text-2xl font-bold mb-8">
+        <h3 className="text-center text-blue-600 text-2xl font-bold mb-8 tracking-wide">
           Add {modelName}
         </h3>
 
         {message && (
-          <div className="mb-4 text-center text-red-500">
+          <div className="mb-6 p-3 rounded-md text-center text-sm font-medium bg-red-50 text-red-600 border border-red-100">
             {message}
           </div>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-6"
+          className="space-y-5"
         >
 
           {/* Base Fields */}
           {fields.map((field) => (
-            <div key={field.name}>
-              <div className="grid grid-cols-[220px_1fr] gap-4 items-center">
+            <div key={field.name} className="flex flex-col">
+              <div className="grid grid-cols-[200px_1fr] gap-4 items-center">
 
-                <label className="font-semibold">
+                <label className="text-sm font-semibold text-slate-700">
                   {field.label}
                 </label>
 
-                {renderField(field)}
+                {/* Wrapper to control and reduce the field width */}
+                <div className="w-full max-w-md">
+                  {renderField(field)}
+                </div>
               </div>
 
               {errors[field.name] && (
-                <p className="ml-[235px] mt-1 text-sm text-red-500">
+                <p className="ml-[216px] mt-1 text-xs font-medium text-red-500">
                   {errors[field.name]}
                 </p>
               )}
@@ -200,26 +205,30 @@ const AddPage = ({
               errors,
             })}
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg"
-          >
-            Add {modelName}
-          </button>
+          <div className="pt-4 flex flex-col items-center">
+            <button
+              type="submit"
+              className="w-full max-w-md bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md shadow-sm transition-colors text-sm"
+            >
+              Add {modelName}
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                router.push(`/${modelName}`)
+              }
+              className="w-full max-w-md mt-3 border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium py-2.5 rounded-md transition-colors text-sm text-center"
+            >
+              ← Back to List
+            </button>
+          </div>
 
         </form>
 
-        <button
-          onClick={() =>
-            router.push(`/${modelName}`)
-          }
-          className="w-full mt-3 border border-blue-600 text-blue-600 py-3 rounded-lg"
-        >
-          ← Back
-        </button>
-
       </div>
     </div>
+    </Sidebar>
   );
 };
 
