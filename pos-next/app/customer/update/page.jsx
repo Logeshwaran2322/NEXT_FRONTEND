@@ -17,34 +17,13 @@ from "../../../components/customer/CustomerValidation";
 
 export default function CustomerUpdatePage() {
 
-  const router =
-    useRouter();
-
-  const searchParams =
-    useSearchParams();
-
-  const identifier =
-    searchParams.get(
-      "identifier"
-    ) || "";
-
-  const [loading,
-    setLoading] =
-    useState(true);
-
-  const [saving,
-    setSaving] =
-    useState(false);
-
-  const [errors,
-    setErrors] =
-    useState({});
-
-  const [formData,
-    setFormData] =
-    useState(
-      customerInitialData
-    );
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const identifier =searchParams.get("identifier") || "";
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState(customerInitialData);
 
   useEffect(() => {
     if (identifier) {
@@ -106,12 +85,10 @@ if (
 ) {
   return;
 }
-
       try {
         setSaving(
           true
         );
-
         await api.put(
           "/customer/update",
           {
@@ -161,14 +138,12 @@ if (
     Loading customer data...
   </div>
 )}
-
           <form
             onSubmit={
               updateCustomer
             }
             className="space-y-6"
           >
-
             <CustomerForm
               formData={
                 formData
@@ -206,11 +181,8 @@ if (
               >
                 Back
               </button>
-
             </div>
-
           </form>
-
         </div>
       </div>
     </Sidebar>

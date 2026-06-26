@@ -309,11 +309,11 @@ const CartPage = () => {
     if (!customer || !confirm("Are you sure you want to clear the cart?")) return;
     try {
      await api.delete("/cart/delete", {
-  headers: getHeaders(),
-  data: {
-    identifier: customer,
-  },
-});
+      headers: getHeaders(),
+      data: {
+        identifier: customer,
+      },
+    });
       setEntries([]); setCartData(null); showMessage("Cart cleared");
     } catch { showMessage("Failed to clear cart"); }
   };

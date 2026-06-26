@@ -14,18 +14,11 @@ from "../../../components/customer/CustomerValidation";
 export default function CustomerAddPage() {
   const router = useRouter();
 
-  const [formData, setFormData] =
-    useState(customerInitialData);
-
-  const [errors, setErrors] =
-    useState({});
-
-  const [loading, setLoading] =
-    useState(false);
-
+  const [formData, setFormData] = useState(customerInitialData);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -153,11 +146,8 @@ if (
               >
                 Cancel
               </button>
-
             </div>
-
           </form>
-
         </div>
       </div>
     </Sidebar>

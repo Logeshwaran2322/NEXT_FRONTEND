@@ -172,21 +172,21 @@ useEffect(() => {
             <div class="meta-item"><b>Order ID</b><span class="meta-value meta-mono">${selected.identifier}</span></div>
            <div class="meta-item">
   <b>Customer</b><span class="meta-value">${customerName || "Walk-in Customer"}</span>
-  ${
-    selected.customerIdentifier
-      ? `
-      <div style="
-        font-size:12px;
-        color:#64748b;
-        margin-top:4px;
-        font-family:monospace;
-      ">
-        ID: ${selected.customerIdentifier}
-      </div>
-    `
-      : ""
-  }
-</div>
+                ${
+                  selected.customerIdentifier
+                    ? `
+                    <div style="
+                      font-size:12px;
+                      color:#64748b;
+                      margin-top:4px;
+                      font-family:monospace;
+                    ">
+                      ID: ${selected.customerIdentifier}
+                    </div>
+                  `
+                    : ""
+                }
+              </div>
             <div class="meta-item"><b>Payment Via</b><span class="meta-value" style="text-transform: uppercase;">${selected.paymentMethod}</span></div>
           </div>
           <table>
@@ -466,11 +466,11 @@ const renderOrders = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-slate-700">
-{selected.entryList?.map((item) => (
-  <tr
-    key={item.productIdentifier}
-    className="hover:bg-slate-50/40 transition-colors"
-  >
+                            {selected.entryList?.map((item) => (
+                              <tr
+                                key={item.productIdentifier}
+                                className="hover:bg-slate-50/40 transition-colors"
+                              >
                             <td className="p-3 font-semibold text-slate-900 pl-4">{item.productIdentifier}</td>
                             <td className="p-3 text-center font-bold text-slate-800">{item.quantity}</td>
                             <td className="p-3 text-slate-500">{money(item.mrp)}</td>
