@@ -46,13 +46,15 @@ export default function CustomerUpdatePage() {
           ...response.data,
         });
 
-      } catch (error) {
-        console.log(error);
+          } catch (error) {
+      const message =
+        error?.response?.data?.message ||
+        "Unable to load customer";
 
-        alert(
-          "Unable to load customer"
-        );
-      } finally {
+      alert(message);
+
+      router.push("/customer");
+    } finally {
         setLoading(false);
       }
     };

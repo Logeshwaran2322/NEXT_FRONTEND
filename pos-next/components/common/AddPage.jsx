@@ -18,6 +18,63 @@ const AddPage = ({
   const [formData, setFormData] = useState(initialData);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({});
+  const handleApiError = (
+  err,
+  defaultMessage
+) => {
+  console.log(err);
+
+  if (err.response) {
+    const {
+      status,
+      data,
+    } = err.response;
+
+    if (status === 404) {
+      setMessage(
+        data?.message ||
+        "Data not found"
+      );
+      return;
+    }
+
+    if (status === 403) {
+      setMessage(
+        data?.message ||
+        "Access denied"
+      );
+      return;
+    }
+
+    if (status === 401) {
+      setMessage(
+        "Session expired. Login again"
+      );
+      return;
+    }
+
+    if (status === 500) {
+      setMessage(
+        data?.message ||
+        "Internal server error"
+      );
+      return;
+    }
+
+    setMessage(
+      data?.message ||
+      defaultMessage
+    );
+
+  } else if (err.request) {
+    setMessage(
+      "Server not responding"
+    );
+
+  } else {
+    setMessage(defaultMessage);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,10 +166,11 @@ const validate = () => {
       }, 1500);
 
     } catch (err) {
-      console.log(formData);
-      console.error(err);
-      setMessage("Failed to add");
-    }
+  handleApiError(
+    err,
+    "Failed to add"
+  );
+}
   };
 
   return (

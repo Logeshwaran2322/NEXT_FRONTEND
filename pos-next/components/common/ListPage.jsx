@@ -21,8 +21,44 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  const [searchQuery, setSearchQuery] = useState("");
+const [searchQuery, setSearchQuery] = useState("");
+const handleApiError = (err, defaultMessage) => {
+  console.log(err);
 
+  if (err.response) {
+    const {
+      status,
+      data,
+    } = err.response;
+
+    if (status === 404) {
+      alert(data?.message || "Data not found");
+      return;
+    }
+
+    if (status === 500) {
+      alert(data?.message || "Internal server error");
+      return;
+    }
+
+    if (status === 403) {
+      alert("Access denied");
+      return;
+    }
+
+    if (status === 401) {
+      alert("Session expired. Login again");
+      return;
+    }
+
+    alert(data?.message || defaultMessage);
+
+  } else if (err.request) {
+    alert("Server not responding");
+  } else {
+    alert(defaultMessage);
+  }
+};
   const fetchData = async () => {
     try {
       const isSearchEmpty = searchQuery.trim() === "";
@@ -58,9 +94,11 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
         setTotalRecords(filtered.length);
       }
     } catch (err) {
-      console.error(err);
-      alert("Failed to fetch data");
-    }
+  handleApiError(
+    err,
+    "Failed to fetch data"
+  );
+}
   };
 
   useEffect(() => {
@@ -105,9 +143,11 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
       setErrors({});
       setShowModal(true);
     } catch (err) {
-      console.error("Error fetching individual row data:", err);
-      alert("Failed to fetch current record details from server.");
-    }
+  handleApiError(
+    err,
+    "Failed to fetch current record"
+  );
+}
   };
 
   const handleUpdate = async () => {
@@ -122,9 +162,11 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
       setShowModal(false);
       setRefresh((prev) => prev + 1);
     } catch (err) {
-      console.error(err);
-      alert("Update failed");
-    }
+  handleApiError(
+    err,
+    "Update failed"
+  );
+}
   };
 
   const start = page * sizePerPage + 1;
@@ -258,8 +300,11 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
                                   }
                                 });
                                 setRefresh((prev) => prev + 1);
-                              } catch {
-                                alert("Delete failed");
+                              } catch (err) {
+                                handleApiError(
+                                  err,
+                                  "Delete failed"
+                                );
                               }
                             }}
                             className="bg-red-500 text-white px-2 py-1 rounded text-sm"
