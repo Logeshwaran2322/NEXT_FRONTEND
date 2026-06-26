@@ -1,7 +1,6 @@
 'use client';
 
 import AddPage from "../../../components/Common/AddPage";
-import Sidebar from "../../../components/layout/Sidebar";
 import Shelves from "../../../components/dropdown/shelves";
 
 export default function RackAdd() {
@@ -24,11 +23,9 @@ component: Shelves,
 ];
 
   return (
-    <Sidebar>
       <AddPage
         fields={fields}
         modelName="rack"
       />
-    </Sidebar>
   );
 }

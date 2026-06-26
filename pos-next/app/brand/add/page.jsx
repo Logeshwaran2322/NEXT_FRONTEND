@@ -1,7 +1,6 @@
 'use client';
 
 import AddPage from "../../../components/Common/AddPage";
-import Sidebar from "../../../components/layout/Sidebar";
 
 export default function BrandAdd() {
   const fields = [
@@ -19,16 +18,13 @@ export default function BrandAdd() {
       name: "description",
       label: "Description",
       type: "textarea",
-      required: false,
     },
   ];
 
   return (
-    <Sidebar>
       <AddPage
         fields={fields}
         modelName="brand"
       />
-    </Sidebar>
   );
 }

@@ -16,7 +16,7 @@ export default function UpdateWareHouse() {
       type: "text",
     },
     {
-      name: "phoneNumber",
+      name: "phoneNo",
       label: "Phone Number",
       type: "phone",
     },

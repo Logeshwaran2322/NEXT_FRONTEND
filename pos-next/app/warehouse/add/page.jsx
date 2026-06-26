@@ -20,7 +20,7 @@ export default function AddWareHouse() {
       type: "text",
     },
     {
-      name: "phoneNumber",
+      name: "phoneNo",
       label: "Phone Number",
       type: "text",
     },

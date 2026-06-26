@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import PropTypes from "prop-types";
 import api from "../../services/api";
 import Sidebar from "../layout/Sidebar";
+import { validateForm } from "../../components/common/validation";
 
 const AddPage = ({
   fields,
@@ -32,56 +33,16 @@ const AddPage = ({
     }));
   };
 
-  const validate = () => {
-    const newErrors = {};
+const validate = () => {
+  const newErrors = validateForm(
+    fields,
+    formData
+  );
 
-    fields.forEach((field) => {
-      const value = formData[field.name];
+  setErrors(newErrors);
 
-      if (field.required === false) return;
-
-      if (
-        value === undefined ||
-        value === null ||
-        value.toString().trim() === ""
-      ) {
-        newErrors[field.name] =
-          `${field.label} is required`;
-      }
-
-      if (
-        field.name === "username" &&
-        value &&
-        !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value)
-      ) {
-        newErrors[field.name] =
-          "Invalid email format";
-      }
-
-      if (
-        field.type === "password" &&
-        value &&
-        value.length < 6
-      ) {
-        newErrors[field.name] =
-          "Password must be at least 6 characters";
-      }
-
-      if (field.name === "phoneNo" && value) {
-        if (!/^\d+$/.test(value)) {
-          newErrors[field.name] =
-            "Phone number must contain only digits";
-        } else if (value.length !== 10) {
-          newErrors[field.name] =
-            "Phone number must be exactly 10 digits";
-        }
-      }
-    });
-
-    setErrors(newErrors);
-
-    return Object.keys(newErrors).length === 0;
-  };
+  return Object.keys(newErrors).length === 0;
+};
 
   const renderField = (field) => {
     if (field.component) {
@@ -173,8 +134,6 @@ const AddPage = ({
           onSubmit={handleSubmit}
           className="space-y-5"
         >
-
-          {/* Base Fields */}
           {fields.map((field) => (
             <div key={field.name} className="flex flex-col">
               <div className="grid grid-cols-[200px_1fr] gap-4 items-center">
@@ -182,13 +141,10 @@ const AddPage = ({
                 <label className="text-sm font-semibold text-slate-700">
                   {field.label}
                 </label>
-
-                {/* Wrapper to control and reduce the field width */}
                 <div className="w-full max-w-md">
                   {renderField(field)}
                 </div>
               </div>
-
               {errors[field.name] && (
                 <p className="ml-[216px] mt-1 text-xs font-medium text-red-500">
                   {errors[field.name]}
@@ -196,14 +152,11 @@ const AddPage = ({
               )}
             </div>
           ))}
-
-          {/* Extra Customer Fields */}
-          {renderForm &&
-            renderForm({
-              formData,
-              handleChange,
-              errors,
-            })}
+          {renderForm?.({
+            formData,
+            handleChange,
+            errors,
+          })}
 
           <div className="pt-4 flex flex-col items-center">
             <button

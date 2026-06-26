@@ -1,7 +1,6 @@
 'use client';
 
 import AddPage from "../../../components/Common/AddPage";
-import Sidebar from "../../../components/layout/Sidebar";
 
 export default function UnitAdd() {
   const fields = [
@@ -18,11 +17,9 @@ export default function UnitAdd() {
   ];
 
   return (
-    <Sidebar>
-      <AddPage
+     <AddPage
         fields={fields}
         modelName="unit"
       />
-    </Sidebar>
   );
 }

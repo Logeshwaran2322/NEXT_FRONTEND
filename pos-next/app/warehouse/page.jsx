@@ -8,7 +8,7 @@ export default function WareHouseList() {
     "identifier",
     "location",
     "contactPerson",
-    "phoneNumber",
+    "phoneNo",
   ];
 
   const fields = [
@@ -28,7 +28,7 @@ export default function WareHouseList() {
       type: "text",
     },
     {
-      name: "phoneNumber",
+      name: "phoneNo",
       label: "Phone Number",
       type: "text",
     },

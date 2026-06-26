@@ -65,6 +65,18 @@ const InputField = ({
     )}
   </div>
 );
+InputField.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  onChange: PropTypes.func.isRequired,
+  type: PropTypes.string,
+  error: PropTypes.string,
+  readOnly: PropTypes.bool,
+};
 
 const AddressSection = ({
   title,
@@ -84,6 +96,19 @@ const AddressSection = ({
       },
     });
   };
+  AddressSection.propTypes = {
+  title: PropTypes.string.isRequired,
+  prefix: PropTypes.string.isRequired,
+  value: PropTypes.shape({
+    addressLine: PropTypes.string,
+    city: PropTypes.string,
+    state: PropTypes.string,
+    zip: PropTypes.string,
+    country: PropTypes.string,
+  }),
+  handleChange: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+};
 
   const fields = [
     "addressLine",
@@ -166,40 +191,40 @@ const CustomerForm = ({
 
       <div className="grid grid-cols-2 gap-4">
 
-        <div>
-          <label className="block mb-1">
-            Party Type
-          </label>
+<div>
+<label className="block mb-1">
+  Party Type{' '}
 
-          <select
-            name="partyType"
-            value={formData.partyType}
-            onChange={handleChange}
-            className="w-full border rounded-lg p-3"
-          >
-            <option value="">
-              Select
-            </option>
+  <select
+    name="partyType"
+    value={formData.partyType}
+    onChange={handleChange}
+    className="w-full border rounded-lg p-3"
+  >
+    <option value="">
+      Select
+    </option>
 
-            <option value="Customer">
-              Customer
-            </option>
+    <option value="Customer">
+      Customer
+    </option>
 
-            <option value="Dealer">
-              Dealer
-            </option>
+    <option value="Dealer">
+      Dealer
+    </option>
 
-            <option value="Wholesaler">
-              Wholesaler
-            </option>
-          </select>
+    <option value="Wholesaler">
+      Wholesaler
+    </option>
+  </select>
+</label>
 
-          {errors.partyType && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.partyType}
-            </p>
-          )}
-        </div>
+  {errors.partyType && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.partyType}
+    </p>
+  )}
+</div>
 
         <div className="flex gap-2 items-end">
 

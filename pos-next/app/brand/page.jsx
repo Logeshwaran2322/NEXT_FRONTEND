@@ -25,7 +25,6 @@ export default function BrandList() {
       name: "description",
       label: "Description",
       type: "textarea",
-      required: false,
     },
   ];
 

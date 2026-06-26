@@ -70,14 +70,24 @@ const customSelectStyles = {
     overflow: "hidden",
     zIndex: 9999,
   }),
-  option: (base, state) => ({
+option: (base, state) => {
+  let backgroundColor = "white";
+
+  if (state.isSelected) {
+    backgroundColor = "#2563EB";
+  } else if (state.isFocused) {
+    backgroundColor = "#F3F4F6";
+  }
+
+  return {
     ...base,
-    backgroundColor: state.isSelected ? "#2563EB" : state.isFocused ? "#F3F4F6" : "white",
+    backgroundColor,
     color: state.isSelected ? "white" : "#1F2937",
     fontSize: "14px",
     padding: "10px 14px",
     cursor: "pointer",
-  }),
+  };
+},
 };
 
 const CustomerField = ({ value, onChange, customers }) => {
@@ -88,23 +98,28 @@ const CustomerField = ({ value, onChange, customers }) => {
 
   const selectedOption = options.find((o) => o.value === value) || null;
 
-  return (
-    <div className="flex-1 min-w-[240px]">
-      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-        Customer
-      </label>
-      <div className="flex items-center bg-white border-2 border-gray-300 rounded-xl hover:border-gray-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition-all px-2 shadow-sm">
-        <Select
-          options={options}
-          value={selectedOption}
-          onChange={(opt) => onChange(opt?.value || "")}
-          placeholder="Search customer…"
-          className="flex-1 text-sm"
-          styles={customSelectStyles}
-        />
-      </div>
+return (
+  <div className="flex-1 min-w-[240px]">
+    <label
+      htmlFor="customer-select"
+      className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5"
+    >
+      Customer
+    </label>
+
+    <div className="flex items-center bg-white border-2 border-gray-300 rounded-xl hover:border-gray-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition-all px-2 shadow-sm">
+      <Select
+        inputId="customer-select"
+        options={options}
+        value={selectedOption}
+        onChange={(opt) => onChange(opt?.value || "")}
+        placeholder="Search customer…"
+        className="flex-1 text-sm"
+        styles={customSelectStyles}
+      />
     </div>
-  );
+  </div>
+);
 };
 
 const CartTable = ({ entries, onQtyChange, onRemove }) => (
@@ -270,14 +285,19 @@ const CartPage = () => {
   const handleQtyChange = async (index, qty) => {
     if (!qty || Number(qty) < 1) return;
     try {
-      await api.post("/cartEntry/update", { ...entries[index], quantity: Number(qty) }, { headers: getHeaders() });
+      await api.put("/cartEntry/update", { ...entries[index], quantity: Number(qty) }, { headers: getHeaders() });
       await fetchCart(customer);
     } catch (err) { console.error(err); }
   };
 
   const handleRemove = async (index) => {
     try {
-      await api.post(`/cartEntry/delete?identifier=${entries[index].identifier}`, {}, { headers: getHeaders() });
+     await api.delete(
+  `/cartEntry/delete?identifier=${entries[index].identifier}`,
+  {
+    headers: getHeaders(),
+  }
+);
       await fetchCart(customer);
       showMessage("Item removed");
     } catch (err) { console.error(err); }
@@ -288,7 +308,12 @@ const CartPage = () => {
   const handleClearCart = async () => {
     if (!customer || !confirm("Are you sure you want to clear the cart?")) return;
     try {
-      await api.post("/cart/delete", { identifier: customer }, { headers: getHeaders() });
+     await api.delete("/cart/delete", {
+  headers: getHeaders(),
+  data: {
+    identifier: customer,
+  },
+});
       setEntries([]); setCartData(null); showMessage("Cart cleared");
     } catch { showMessage("Failed to clear cart"); }
   };
@@ -339,7 +364,8 @@ const CartPage = () => {
 
   if (createdOrder) {
     router.push(`/order?open=${createdOrder}`);
-  } else {
+  } 
+  else {
     router.push("/order");
   }
       } else {
@@ -405,8 +431,6 @@ const CartPage = () => {
     <Sidebar>
       <div className="min-h-screen bg-gray-50/50 p-4 md:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
-          
-          {/* Top Panel Brand Bar Header */}
           <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-200">
@@ -430,8 +454,6 @@ const CartPage = () => {
               {message}
             </div>
           )}
-
-          {/* Account & Profile Dynamic Initialization Section */}
           <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm p-4 mb-6">
             <div className="flex flex-wrap gap-4 items-end">
               <CustomerField value={customer} onChange={setCustomer} customers={customers} />
@@ -442,19 +464,17 @@ const CartPage = () => {
                 <UserPlus size={16} />
                 New Customer
               </button>
-              <div className="flex-1 min-w-[160px]">
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Customer ID</label>
+                <div className="flex-1 min-w-[160px]">
+                  <p className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+              Customer ID
+              </p>
                 <div className="h-[44px] flex items-center px-4 bg-gray-50 border-2 border-gray-300 rounded-xl text-sm text-gray-900 font-mono font-bold shadow-inner">
                   {customer || <span className="text-gray-400">—</span>}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Split Screen Application Workspace Terminal */}
+                </div>
+              </div>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            {/* Left Column Window Panel: Visual Dynamic Catalog Grid */}
             <div className="lg:col-span-5 bg-white rounded-2xl border-2 border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-240px)] lg:sticky lg:top-6">
               <div className="p-4 bg-gray-50/70 border-b border-gray-200 space-y-3">
                 <div className="flex items-center justify-between">
@@ -465,8 +485,6 @@ const CartPage = () => {
                     {filteredProducts.length} items
                   </span>
                 </div>
-                
-                {/* Clean inline structural dynamic layout item search input field */}
                 <div className="relative flex items-center">
                   <Search size={16} className="absolute left-3.5 text-gray-400 pointer-events-none" />
                   <input
@@ -478,8 +496,6 @@ const CartPage = () => {
                   />
                 </div>
               </div>
-
-              {/* Dynamic Scrollable Track Container */}
               <div className="flex-1 overflow-y-auto p-4 space-y-2.5 bg-gray-50/30">
                 {filteredProducts.length === 0 ? (
                   <div className="text-center py-12 text-sm font-medium text-gray-400">
@@ -490,16 +506,18 @@ const CartPage = () => {
                     const sPrice = prices.find((pr) => pr.product === p.identifier && pr.priceType === "SELLING PRICE")?.amount || 0;
                     const mrpPrice = prices.find((pr) => pr.product === p.identifier && pr.priceType === "MRP")?.amount || 0;
 
-                    return (
-                      <div
-                        key={p.identifier}
-                        onClick={() => !savingId && handleSelectProduct(p.identifier)}
-                        className={`w-full text-left bg-white border-2 rounded-xl p-3.5 flex items-center justify-between gap-4 transition-all shadow-xs cursor-pointer select-none group ${
-                          savingId === p.identifier 
-                            ? "border-blue-300 bg-blue-50/30 opacity-60" 
-                            : "border-gray-200 hover:border-blue-500 hover:shadow-md active:scale-[0.99]"
-                        }`}
-                      >
+return (
+          <button
+            key={p.identifier}
+            type="button"
+            disabled={Boolean(savingId)}
+            onClick={() => handleSelectProduct(p.identifier)}
+            className={`w-full text-left bg-white border-2 rounded-xl p-3.5 flex items-center justify-between gap-4 transition-all shadow-xs cursor-pointer select-none group ${
+              savingId === p.identifier
+                ? "border-blue-300 bg-blue-50/30 opacity-60"
+                : "border-gray-200 hover:border-blue-500 hover:shadow-md active:scale-[0.99]"
+            }`}
+          >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 border border-gray-200 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shrink-0">
                             <Package size={18} />
@@ -522,22 +540,18 @@ const CartPage = () => {
                             </span>
                           )}
                         </div>
-                      </div>
+                      </button>
                     );
                   })
                 )}
               </div>
             </div>
-
-            {/* Right Column Window Panel: Active Client Order Workspace */}
             <div className="lg:col-span-7 flex flex-col">
               <CartTable entries={entries} onQtyChange={handleQtyChange} onRemove={handleRemove} />
               <CartTotals cart={cartData} />
             </div>
 
           </div>
-
-          {/* Core Master Global Dashboard Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
             <button
               onClick={() => router.push("/home")}
@@ -574,8 +588,6 @@ const CartPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Modular Create Customer Modal */}
       {showCustomerPopup && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex justify-center items-center z-[99999] p-4 animate-fade-in">
           <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform scale-100 transition-all">
@@ -602,8 +614,15 @@ const CartPage = () => {
                 { label: "Credit Limit (₹)", key: "creditLimit", placeholder: "0.00", type: "number" },
               ].map(({ label, key, placeholder, type }) => (
                 <div key={key}>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">{label}</label>
+                  <label
+                    htmlFor={key}
+                    className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5"
+                  >
+                    {label}
+                  </label>
+
                   <input
+                    id={key}
                     type={type}
                     placeholder={placeholder}
                     value={newCustomer[key]}
@@ -631,8 +650,6 @@ const CartPage = () => {
           </div>
         </div>
       )}
-
-      {/* Checkout Options and Confirmation Modal */}
       {showCheckoutPopup && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex justify-center items-center z-[99999] p-4 animate-fade-in">
           <div className="bg-white w-full max-w-[460px] rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform scale-100 transition-all">
@@ -652,16 +669,25 @@ const CartPage = () => {
             </div>
 
             <div className="px-6 py-5 space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Payable</label>
-                <div className="text-2xl font-black text-blue-700 tracking-tight">
-                  {currency(cartData?.totalPrice)}
-                </div>
-              </div>
+            <div>
+              <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                Total Payable
+              </span>
 
+              <div className="text-2xl font-black text-blue-700 tracking-tight">
+                {currency(cartData?.totalPrice)}
+              </div>
+            </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Payment Mode</label>
+                <label
+                  htmlFor="paymentMethod"
+                  className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5"
+                >
+                  Payment Mode
+                </label>
+
                 <select
+                  id="paymentMethod"
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   className="w-full h-11 px-4 border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-900 bg-white focus:outline-none focus:border-blue-600 transition-all"
@@ -671,10 +697,15 @@ const CartPage = () => {
                   <option value="UPI">UPI</option>
                 </select>
               </div>
-
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Amount Received (₹)</label>
-                <input
+              <label
+                htmlFor="receivedAmount"
+                className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5"
+              >
+                Amount Received (₹)
+              </label>
+              <input
+                id="receivedAmount"
                   type="number"
                   placeholder="0.00"
                   value={receivedAmount}

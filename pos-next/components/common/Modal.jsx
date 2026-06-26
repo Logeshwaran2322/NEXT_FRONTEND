@@ -23,13 +23,14 @@ const Modal = ({
       {fields.map((field) => (
         <div key={field.name}>
 
-          <label className="block mb-1 font-medium">
+          <label htmlFor={field.name} className="block mb-1 font-medium">
             {field.label}
           </label>
 
           {field.component ? (
 
             field.component({
+              id: field.name,
               value: formData[field.name],
 
               onChange: (value) =>
@@ -44,6 +45,7 @@ const Modal = ({
           ) : (
 
             <input
+              id={field.name}
               type={field.type || "text"}
               name={field.name}
               value={
@@ -51,9 +53,10 @@ const Modal = ({
               }
               onChange={handleChange}
               readOnly={
-                field.name ===
-                "identifier"
+                field.readOnly ||
+                field.name === "identifier"
               }
+
               className={`
                 w-full
                 border
@@ -61,9 +64,9 @@ const Modal = ({
                 px-3
                 py-2
                 ${
-                  field.name ===
-                  "identifier"
-                    ? "bg-gray-100"
+                  field.readOnly ||
+                  field.name === "identifier"
+                    ? "bg-gray-100 cursor-not-allowed"
                     : ""
                 }
               `}
@@ -79,9 +82,6 @@ const Modal = ({
 
         </div>
       ))}
-
-      {/* AUDIT SECTION */}
-
       <div className="border-t pt-5">
 
         <h3 className="font-semibold mb-4">
@@ -91,11 +91,12 @@ const Modal = ({
         <div className="space-y-3">
 
           <div>
-            <label className="block mb-1">
+            <label htmlFor="createdBy" className="block mb-1">
               Created By
             </label>
 
             <input
+              id="createdBy"
               value={
                 formData.createdBy || ""
               }
@@ -112,11 +113,12 @@ const Modal = ({
           </div>
 
           <div>
-            <label className="block mb-1">
+            <label htmlFor="createdOn" className="block mb-1">
               Created On
             </label>
 
             <input
+              id="createdOn"
               value={
                 formatDate(
                   formData.createdOn
@@ -135,11 +137,12 @@ const Modal = ({
           </div>
 
           <div>
-            <label className="block mb-1">
+            <label htmlFor="modifiedBy" className="block mb-1">
               Modified By
             </label>
 
             <input
+              id="modifiedBy"
               value={
                 formData.modifiedBy || ""
               }
@@ -156,11 +159,12 @@ const Modal = ({
           </div>
 
           <div>
-            <label className="block mb-1">
+            <label htmlFor="modifiedOn" className="block mb-1">
               Modified On
             </label>
 
             <input
+              id="modifiedOn"
               value={
                 formatDate(
                   formData.modifiedOn

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {useSearchParams,useRouter} from "next/navigation";
+import PropTypes from "prop-types";
 import {
   Eye,
   Receipt,
@@ -213,16 +214,19 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        <script>
-          window.onload = () => { window.print(); };
-        </script>
       </body>
       </html>
     `;
+const win = window.open("", "_blank");
 
-    const win = window.open("", "_blank");
-    win.document.write(invoice);
-    win.document.close();
+if (win) {
+  win.document.documentElement.innerHTML = invoice;
+
+  setTimeout(() => {
+    win.focus();
+    win.print();
+  }, 300);
+}
   };
   const closeOrderModal = () => {
   const openedFromCheckout = searchParams.get("open");
@@ -233,13 +237,80 @@ useEffect(() => {
     router.push("/cart");
   }
 };
+const renderOrders = () => {
+  if (loading) {
+    return [
+      <tr key="loading">
+        <td
+          colSpan="5"
+          className="text-center py-20 text-slate-400 font-medium"
+        >
+          <div className="flex justify-center items-center gap-2">
+            <span
+              className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"
+            />
+            {" "}
+            Loading orders...
+          </div>
+        </td>
+      </tr>,
+    ];
+  }
 
+  if (orders.length === 0) {
+    return [
+      <tr key="empty">
+        <td
+          colSpan="5"
+          className="text-center py-20 text-slate-400 font-medium"
+        >
+          No Orders Found
+        </td>
+      </tr>,
+    ];
+  }
+
+  return orders.map((order) => (
+    <tr
+      key={order.identifier}
+      className="hover:bg-slate-50/80 transition-colors group"
+    >
+      <td className="p-4 font-mono font-bold text-slate-800 text-sm pl-6">
+        {order.identifier}
+      </td>
+
+      <td className="p-4 text-slate-600 text-sm font-medium">
+        {order.customerIdentifier || "Walk-in Customer"}
+      </td>
+
+      <td className="p-4">
+        <span
+          className={`px-2.5 py-1 text-xs font-semibold rounded-lg border uppercase tracking-wide ${getPaymentBadge(order.paymentMethod)}`}
+        >
+          {order.paymentMethod || "N/A"}
+        </span>
+      </td>
+
+      <td className="p-4 font-semibold text-slate-900 text-sm">
+        {money(order.totalPrice)}
+      </td>
+
+      <td className="p-4 text-right pr-6">
+        <button
+          onClick={() => openOrder(order.identifier)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+        >
+          <Eye size={14} />
+          View Details
+        </button>
+      </td>
+    </tr>
+  ));
+};
   return (
     <Sidebar>
       <div className="min-h-screen bg-slate-50/50 p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-6">
-          
-          {/* HEADER SECTION */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-100">
@@ -247,13 +318,12 @@ useEffect(() => {
               </div>
               <div>
                 <div className="flex items-center gap-3">
-                  {/* BACK TO HOME BUTTON */}
-                  <button 
-                    onClick={() => window.location.href = "/home"} 
+                  <button
+                    onClick={() => router.push("/home")}
                     className="inline-flex items-center justify-center p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors mr-1"
                     title="Back to Home"
                   >
-                    <ArrowLeft size={18} />
+                <ArrowLeft size={18} />
                   </button>
                   <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Sales History</h1>
                 </div>
@@ -272,8 +342,6 @@ useEffect(() => {
               Refresh
             </button>
           </div>
-
-          {/* TABLE CONTAINER */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -286,56 +354,11 @@ useEffect(() => {
                     <th className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right pr-6">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {loading ? (
-                    <tr>
-                      <td colSpan="5" className="text-center py-20 text-slate-400 font-medium">
-                        <div className="flex justify-center items-center gap-2">
-                          <span className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
-                          Loading orders...
-                        </div>
-                      </td>
-                    </tr>
-                  ) : orders.length === 0 ? (
-                    <tr>
-                      <td colSpan="5" className="text-center py-20 text-slate-400 font-medium">
-                        No Orders Found
-                      </td>
-                    </tr>
-                  ) : (
-                    orders.map((order) => (
-                      <tr key={order.identifier} className="hover:bg-slate-50/80 transition-colors group">
-                        <td className="p-4 font-mono font-bold text-slate-800 text-sm pl-6">
-                          {order.identifier}
-                        </td>
-                        <td className="p-4 text-slate-600 text-sm font-medium">
-                          {order.customerIdentifier || "Walk-in Customer"}
-                        </td>
-                        <td className="p-4">
-                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg border uppercase tracking-wide ${getPaymentBadge(order.paymentMethod)}`}>
-                            {order.paymentMethod || "N/A"}
-                          </span>
-                        </td>
-                        <td className="p-4 font-semibold text-slate-900 text-sm">
-                          {money(order.totalPrice)}
-                        </td>
-                        <td className="p-4 text-right pr-6">
-                          <button
-                            onClick={() => openOrder(order.identifier)}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                          >
-                            <Eye size={14} />
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
+                  <tbody className="divide-y divide-slate-100">
+                    {renderOrders()}
+                  </tbody>
               </table>
             </div>
-
-            {/* DYNAMIC PAGINATION FOOTER */}
             <div className="bg-white border-t border-slate-100 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
                 <div className="flex items-center gap-2">
@@ -344,7 +367,7 @@ useEffect(() => {
                     value={pageSize}
                     onChange={(e) => {
                       setPageSize(Number(e.target.value));
-                      setCurrentPage(0); // Reset page context
+                      setCurrentPage(0);
                     }}
                     className="border border-slate-200 rounded-lg p-1 bg-transparent font-semibold text-slate-700 outline-none focus:border-blue-500"
                   >
@@ -381,13 +404,9 @@ useEffect(() => {
           </div>
 
         </div>
-
-        {/* MODAL DETAILED VIEW */}
         {selected && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex justify-center items-center z-[99999] p-4 animate-fade-in">
             <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100">
-              
-              {/* MODAL TOP HEADER */}
               <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">Order Deep-Dive</h2>
@@ -413,8 +432,6 @@ useEffect(() => {
                   </div>
               </div>
               <div className="p-6 overflow-y-auto space-y-6">
-                
-                {/* DETAILS COMPACT CARDS */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Info label="Customer" value={customerName ? `${customerName} (${selected.customerIdentifier})` : selected.customerIdentifier}/>
                   <Info label="Payment Method" value={selected.paymentMethod} highlight />
@@ -424,8 +441,6 @@ useEffect(() => {
                   />
                   <Info label="Core Reference" value={selected.identifier} isMono />
                 </div>
-
-                {/* PRICING GRAPH CARDS */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                   <Amount title="Original Price" value={selected.originalPrice} />
                   <Amount title="Discount Applied" value={selected.discount} isDiscount />
@@ -433,8 +448,6 @@ useEffect(() => {
                   <Amount title="Cash/Amount Tendered" value={selected.receivedAmount} />
                   <Amount title="Change Returned" value={selected.changeAmount} isChange />
                 </div>
-
-                {/* PRODUCTS BILL TABLE */}
                 <div className="border border-slate-200/80 rounded-xl overflow-hidden">
                   <div className="p-4 bg-slate-50 border-b border-slate-200/80 flex items-center gap-2">
                     <Package size={16} className="text-slate-500" />
@@ -453,8 +466,11 @@ useEffect(() => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-slate-700">
-                        {selected.entryList?.map((item, i) => (
-                          <tr key={i} className="hover:bg-slate-50/40 transition-colors">
+{selected.entryList?.map((item) => (
+  <tr
+    key={item.productIdentifier}
+    className="hover:bg-slate-50/40 transition-colors"
+  >
                             <td className="p-3 font-semibold text-slate-900 pl-4">{item.productIdentifier}</td>
                             <td className="p-3 text-center font-bold text-slate-800">{item.quantity}</td>
                             <td className="p-3 text-slate-500">{money(item.mrp)}</td>
@@ -477,7 +493,6 @@ useEffect(() => {
   );
 }
 
-/* COMPACT SUMMARY CARDS */
 function Info({ label, value, highlight, isMono }) {
   return (
     <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
@@ -488,8 +503,15 @@ function Info({ label, value, highlight, isMono }) {
     </div>
   );
 }
-
-/* FINANCIAL METRICS BLOCK */
+Info.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  highlight: PropTypes.bool,
+  isMono: PropTypes.bool,
+};
 function Amount({ title, value, isTotal, isDiscount, isChange }) {
   let colorTheme = "text-slate-700 bg-white";
   if (isTotal) colorTheme = "text-blue-700 bg-blue-50/50 border-blue-200";
@@ -503,3 +525,13 @@ function Amount({ title, value, isTotal, isDiscount, isChange }) {
     </div>
   );
 }
+Amount.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  isTotal: PropTypes.bool,
+  isDiscount: PropTypes.bool,
+  isChange: PropTypes.bool,
+};

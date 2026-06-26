@@ -85,19 +85,14 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
       [name]: "",
     }));
   };
-
-  // FETCH FRESH DATA ON EDIT CLICK
   const handleEdit = async (item) => {
     try {
-      // 1. Hit the single get endpoint using the identifier, exactly like UpdatePage does
       const res = await api.get(`/${modelName}/get?identifier=${item.identifier}`);
       const freshData = res.data || {};
-
-      // 2. Format fields (like parsing arrays) using the fresh data
       fields.forEach((field) => {
         if (field.multiple) {
           if (Array.isArray(freshData[field.name])) {
-            freshData[field.name] = freshData[field.name];
+            // already an array
           } else if (freshData[field.name]) {
             freshData[field.name] = freshData[field.name].split(",");
           } else {
@@ -106,7 +101,6 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
         }
       });
 
-      // 3. Set data state and reveal modal
       setFormData(freshData);
       setErrors({});
       setShowModal(true);
@@ -124,7 +118,7 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
       return;
     }
     try {
-      await api.post(`/${modelName}/update`, formData);
+      await api.put(`/${modelName}/update`, formData);
       setShowModal(false);
       setRefresh((prev) => prev + 1);
     } catch (err) {
@@ -258,8 +252,10 @@ const ListPage = ({ keys, fields, modelName, showToggle = true }) => {
                             onClick={async () => {
                               if (!globalThis.confirm("Delete?")) return;
                               try {
-                                await api.post(`/${modelName}/delete`, {
+                                await api.delete(`/${modelName}/delete`, {
+                                  data: {
                                   identifier: item.identifier,
+                                  }
                                 });
                                 setRefresh((prev) => prev + 1);
                               } catch {

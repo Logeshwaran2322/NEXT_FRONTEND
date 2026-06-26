@@ -8,6 +8,8 @@ import api from "../../../services/api";
 import CustomerForm, {
   customerInitialData,
 } from "../../../components/customer/CustomerForm";
+import { validateForm }
+from "../../../components/customer/CustomerValidation";
 
 export default function CustomerAddPage() {
   const router = useRouter();
@@ -30,167 +32,18 @@ export default function CustomerAddPage() {
     }));
   };
 
-  const validate = () => {
-    const newErrors = {};
-
-    // Customer Details
-    if (!formData.name?.trim()) {
-      newErrors.name =
-        "Customer name is required";
-    }
-
-    if (!formData.phoneNo?.trim()) {
-      newErrors.phoneNo =
-        "Phone number is required";
-    } else if (
-      !/^[0-9]{10}$/.test(
-        formData.phoneNo
-      )
-    ) {
-      newErrors.phoneNo =
-        "Enter valid 10 digit phone number";
-    }
-
-    if (!formData.email?.trim()) {
-      newErrors.email =
-        "Email is required";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        formData.email
-      )
-    ) {
-      newErrors.email =
-        "Enter valid email";
-    }
-
-    if (!formData.partyType?.trim()) {
-      newErrors.partyType =
-        "Party type is required";
-    }
-
-    if (
-      formData.creditLimit &&
-      Number(formData.creditLimit) < 0
-    ) {
-      newErrors.creditLimit =
-        "Credit limit cannot be negative";
-    }
-
-    if (
-      formData.balance &&
-      isNaN(
-        Number(formData.balance)
-      )
-    ) {
-      newErrors.balance =
-        "Balance must be numeric";
-    }
-
-    if (
-      !formData.balanceType?.trim()
-    ) {
-      newErrors.balanceType =
-        "Balance type required";
-    }
-
-    // Billing Address
-    if (
-      !formData.billingAddress
-        ?.addressLine?.trim()
-    ) {
-      newErrors.billingAddressLine =
-        "Billing address required";
-    }
-
-    if (
-      !formData.billingAddress
-        ?.city?.trim()
-    ) {
-      newErrors.billingCity =
-        "Billing city required";
-    }
-
-    if (
-      !formData.billingAddress
-        ?.state?.trim()
-    ) {
-      newErrors.billingState =
-        "Billing state required";
-    }
-
-    if (
-      !formData.billingAddress
-        ?.zip?.trim()
-    ) {
-      newErrors.billingZip =
-        "Billing ZIP required";
-    }
-
-    if (
-      !formData.billingAddress
-        ?.country?.trim()
-    ) {
-      newErrors.billingCountry =
-        "Billing country required";
-    }
-
-    // Shipping Address
-    if (
-      !formData.shippingAddress
-        ?.addressLine?.trim()
-    ) {
-      newErrors.shippingAddressLine =
-        "Shipping address required";
-    }
-
-    if (
-      !formData.shippingAddress
-        ?.city?.trim()
-    ) {
-      newErrors.shippingCity =
-        "Shipping city required";
-    }
-
-    if (
-      !formData.shippingAddress
-        ?.state?.trim()
-    ) {
-      newErrors.shippingState =
-        "Shipping state required";
-    }
-
-    if (
-      !formData.shippingAddress
-        ?.zip?.trim()
-    ) {
-      newErrors.shippingZip =
-        "Shipping ZIP required";
-    }
-
-    if (
-      !formData.shippingAddress
-        ?.country?.trim()
-    ) {
-      newErrors.shippingCountry =
-        "Shipping country required";
-    }
-
-    setErrors(newErrors);
-
-    return (
-      Object.keys(newErrors)
-        .length === 0
-    );
-  };
-
   const handleSubmit = async (
     e
   ) => {
     e.preventDefault();
-
-    if (!validate()) {
-      return;
-    }
+if (
+  !validateForm(
+    formData,
+    setErrors
+  )
+) {
+  return;
+}
 
     try {
       setLoading(true);
@@ -252,7 +105,6 @@ export default function CustomerAddPage() {
   return (
     <Sidebar>
       <div className="min-h-screen bg-[#f4f6fb] py-10 px-4 flex justify-center items-start">
-        {/* Adjusted page wrapper to 800px max width for an optimized, professional footprint */}
         <div className="w-full max-w-[800px] bg-white rounded-xl shadow-md border border-slate-100 p-8">
 
           <h1 className="text-2xl font-bold mb-8 text-blue-600 tracking-wide">
@@ -264,8 +116,7 @@ export default function CustomerAddPage() {
               handleSubmit
             }
             className="space-y-6"
-          >
-            {/* The child sub-inputs inside CustomerForm will now automatically scale cleanly within this optimized parent */}
+>
             <CustomerForm
               formData={
                 formData
@@ -277,11 +128,8 @@ export default function CustomerAddPage() {
                 errors
               }
             />
-
-            {/* Separator Line to clean up section breaks */}
             <hr className="border-slate-100 my-4" />
 
-            {/* Action buttons resized to a balanced, user-friendly max width */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2 max-w-md">
 
               <button

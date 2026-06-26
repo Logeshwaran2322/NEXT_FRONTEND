@@ -1,7 +1,9 @@
 'use client';
 
+import PropTypes from "prop-types";
 import Sidebar from "../../components/layout/Sidebar";
 import ListPage from "../../components/common/ListPage";
+
 function ReadOnlyField({ value }) {
   return (
     <input
@@ -11,19 +13,20 @@ function ReadOnlyField({ value }) {
     />
   );
 }
+
 ReadOnlyField.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
   ]),
 };
-export default function PriceList() {
 
+export default function PriceList() {
   const keys = [
     "identifier",
     "product",
     "priceType",
-    "amount"
+    "amount",
   ];
 
   const fields = [
@@ -31,29 +34,29 @@ export default function PriceList() {
       name: "product",
       label: "Product",
       component: ReadOnlyField,
-      type: "text"
+      type: "text",
     },
     {
       name: "priceType",
       label: "Price Type",
-        component: ReadOnlyField,
-      type: "text"
+      component: ReadOnlyField,
+      type: "text",
     },
     {
       name: "amount",
       label: "Amount",
-      type: "number"
-    }
+      type: "number",
+    },
   ];
 
   return (
     <Sidebar>
-    <ListPage
-      keys={keys}
-      fields={fields}
-      modelName="price"
-      showToggle={false}
-    />
+      <ListPage
+        keys={keys}
+        fields={fields}
+        modelName="price"
+        showToggle={false}
+      />
     </Sidebar>
   );
 }

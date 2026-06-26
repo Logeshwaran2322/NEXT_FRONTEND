@@ -17,8 +17,6 @@ export default function CustomerPage() {
     sortField: "identifier",
   });
   const [totalPages, setTotalPages] = useState(0);
-  
-  // Search Bar State
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchCustomers = async () => {
@@ -27,12 +25,10 @@ export default function CustomerPage() {
       const isSearchEmpty = searchQuery.trim() === "";
 
       if (isSearchEmpty) {
-        // Original logic for normal paginated data fetching
         const response = await api.post("/customer/list", pagination);
         setCustomers(response.data?.dtoList || []);
         setTotalPages(response.data?.totalPages || 0);
       } else {
-        // Search logic matching common ListPage
         const response = await api.post("/customer/list", {
           ...pagination,
           page: 0,
@@ -59,19 +55,24 @@ export default function CustomerPage() {
 
   useEffect(() => {
     fetchCustomers();
-  }, [pagination, searchQuery]); // Added searchQuery to dependency array
+  }, [pagination, searchQuery]); 
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-    setPagination((prev) => ({ ...prev, page: 0 })); // Reset to first page on search
+    setPagination((prev) => ({ ...prev, page: 0 })); 
   };
 
   const handleDelete = async (identifier) => {
-    const confirmDelete = window.confirm("Delete customer?");
+    const confirmDelete = globalThis.confirm("Delete customer?");
     if (!confirmDelete) return;
 
     try {
-      const response = await api.post("/customer/delete", { identifier });
+      const response = await api.delete("/customer/delete",
+        {
+          data :{
+            identifier,
+          },
+    });
 
       if (!response.data) {
         throw new Error("Delete failed");
@@ -107,17 +108,11 @@ export default function CustomerPage() {
     <Sidebar>
     <div className="bg-[#f4f6fb] min-h-screen py-10 px-5">
       <div className="max-w-6xl mx-auto">
-        
-        {/* Gradient Header Block */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg mb-4">
           <h2 className="text-xl font-semibold">Customer List</h2>
           <p className="text-sm">View and manage customer entries</p>
         </div>
-
-        {/* Content Wrapper */}
         <div className="bg-white p-5 rounded-lg shadow">
-          
-          {/* Top Actions Block */}
           <div className="flex justify-between mb-4">
             <button
               onClick={() => router.push("/home")}
@@ -132,8 +127,6 @@ export default function CustomerPage() {
               + Add Customer
             </button>
           </div>
-
-          {/* Search Input Box */}
           <div className="mb-4 flex justify-end">
             <div className="relative">
               <input
@@ -145,8 +138,6 @@ export default function CustomerPage() {
               />
             </div>
           </div>
-
-          {/* Table Container */}
           <div className="overflow-x-auto">
             <table className="w-full border border-gray-200">
               <thead>
@@ -175,20 +166,25 @@ export default function CustomerPage() {
                 </tr>
               </thead>
               <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="8" className="text-center p-5 text-blue-600">
-                      Loading...
-                    </td>
-                  </tr>
-                ) : customers.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" className="text-center p-5 text-blue-600">
-                      No Customers Found
-                    </td>
-                  </tr>
-                ) : (
-                  customers.map((customer) => (
+               {loading && (
+  <tr>
+    <td colSpan="9" className="text-center p-5 text-blue-600">
+      Loading...
+    </td>
+  </tr>
+)}
+
+{!loading && customers.length === 0 && (
+  <tr>
+    <td colSpan="9" className="text-center p-5 text-blue-600">
+      No Customers Found
+    </td>
+  </tr>
+)}
+
+{!loading &&
+  customers.length > 0 &&
+  customers.map((customer) => (
                     <tr
                       key={customer.identifier}
                       className="border-t hover:bg-gray-50 text-sm"
@@ -236,8 +232,6 @@ export default function CustomerPage() {
                           </span>
                         </div>
                       </td>
-
-                      {/* Sliding Switch Component */}
                       <td className="py-2 px-3 text-center">
                         <div className="flex flex-col items-center">
                           <label className="relative inline-flex items-center cursor-pointer" aria-label="Toggle status">
@@ -259,11 +253,8 @@ export default function CustomerPage() {
                           </span>
                         </div>
                       </td>
-
-                      {/* Icon Actions Elements */}
                       <td className="py-2 px-3 text-center">
                         <div className="flex gap-3 justify-center items-center">
-                          {/* Update Icon Button */}
                           <button
                             onClick={() =>
                               router.push(
@@ -277,8 +268,6 @@ export default function CustomerPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                             </svg>
                           </button>
-
-                          {/* Delete Icon Button */}
                           <button
                             onClick={() => handleDelete(customer.identifier)}
                             className="text-red-600 hover:text-red-800 p-1 transition-colors"
@@ -292,12 +281,10 @@ export default function CustomerPage() {
                       </td>
                     </tr>
                   ))
-                )}
+                }
               </tbody>
             </table>
           </div>
-
-          {/* Pagination Blocks */}
           <div className="flex justify-center items-center gap-3 mt-4">
             <button
               disabled={pagination.page === 0 || searchQuery !== ""}
