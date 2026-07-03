@@ -3,23 +3,22 @@
 import { useEffect, useState } from "react";
 import {
   useRouter,
-  useSearchParams,
+  useParams,
 } from "next/navigation";
-
-import api from "../../../services/api";
-import Sidebar from "../../../components/layout/Sidebar";
+import api from "../../../../services/api";
+import Sidebar from "../../../../components/layout/Sidebar";
 
 import CustomerForm, {
   customerInitialData,
-} from "../../../components/customer/CustomerForm";
+} from "../../../../components/customer/CustomerForm";
 import { validateForm }
-from "../../../components/customer/CustomerValidation";
+from "../../../../components/customer/CustomerValidation";
 
 export default function CustomerUpdatePage() {
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const identifier =searchParams.get("identifier") || "";
+  const params = useParams();
+  const identifier = params.identifier;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
@@ -35,11 +34,10 @@ export default function CustomerUpdatePage() {
     async () => {
       try {
         setLoading(true);
-
-        const response =
-          await api.get(
-            `/customer/get?identifier=${identifier}`
-          );
+const response =
+  await api.get(
+    `/customer/get?identifier=${identifier}`
+  );
 
         setFormData({
           ...customerInitialData,
